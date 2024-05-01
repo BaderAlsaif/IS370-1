@@ -60,12 +60,12 @@ def handle_user_actions(client_socket, menu, role_flag):
         if action == 'add_menu_item' or action == 'modify_menu_item':
             item_name = client_socket.recv(1024).decode()
             item_price = client_socket.recv(1024).decode()
-            menu.append({"name": item_name, "price": item_price})
+            menu.dump({"name": item_name, "price": item_price})
             save_menu(menu)  # Save the updated menu
             client_socket.send("Menu updated successfully".encode())
-    else:
-        # Handle customer actions if needed
-        pass
+    # else:
+    #     # Handle customer actions if needed
+    #     pass
 
 def main():
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
