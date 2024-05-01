@@ -47,9 +47,25 @@ def handle_client(client_socket, menu, users):
         username, password = client_socket.recv(1024).decode().split(":")
         # Check if the username exists and the password matches
         if username in users and users[username]["password"] == password:
-            client_socket.send("Login successful".encode())
+            role_flag = users[username]["role"]
+            client_socket.send(f"Login successful|{role_flag}".encode())
+            # Continue processing based on user role and actions
+            handle_user_actions(client_socket, menu, role_flag)
         else:
             client_socket.send("Invalid credentials".encode())
+
+def handle_user_actions(client_socket, menu, role_flag):
+    if role_flag == 'owner':
+        action = client_socket.recv(1024).decode()
+        if action == 'add_menu_item' or action == 'modify_menu_item':
+            item_name = client_socket.recv(1024).decode()
+            item_price = client_socket.recv(1024).decode()
+            menu.append({"name": item_name, "price": item_price})
+            save_menu(menu)  # Save the updated menu
+            client_socket.send("Menu updated successfully".encode())
+    else:
+        # Handle customer actions if needed
+        pass
 
 def main():
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
